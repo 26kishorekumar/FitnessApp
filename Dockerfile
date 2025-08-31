@@ -11,13 +11,16 @@ RUN apt-get update && apt-get install -y \
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the dependencies file to the working directory
+# Copy the dependencies file to the working directory.
+# This step is placed here so it can be cached.
 COPY requirements.txt .
 
-# Install any needed packages specified in requirements.txt
+# Install any needed packages specified in requirements.txt.
+# This expensive step will only be re-run if requirements.txt changes.
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application code to the working directory
+# Copy the rest of the application code to the working directory.
+# This is the last step that will be rebuilt on every code change.
 COPY . .
 
 # The command to run tests will be provided by the GitHub Actions workflow.

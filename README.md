@@ -11,8 +11,6 @@ This is a web-based fitness and gym tracker application, built using **Flask** a
 ├── .github/
 │   └── workflows/
 │       └── main.yml        # GitHub Actions CI/CD workflow
-├── templates/
-│   └── index.html          # HTML template for the frontend
 ├── app.py                  # Core Flask application logic
 ├── test_app.py             # Pytest unit tests
 ├── Dockerfile              # Docker container definition
@@ -28,97 +26,81 @@ Follow these steps to set up and run the project on your local machine.
 
 ### 1\. Version Control Setup (Git & GitHub)
 
-First, you'll need to get the project on GitHub to use GitHub Actions.
+First, you need to track your project files with Git and host them on GitHub.
 
-  * **Initialize a Git repository**:
+Initialize Git: Open a terminal in your project folder (where app.py is located) and run:
 
-    ```bash
-    git init
-    git add .
-    git commit -m "Initial commit: Add Flask app and project files"
-    ```
+git init
+git branch -M main
 
-  * **Create a GitHub Repository**: Go to GitHub and create a new repository. **Do not** initialize it with a README or `.gitignore` file.
+Add and Commit Files: Add all the files we created to Git.
 
-  * **Link Local to Remote**: Follow the instructions provided by GitHub to link your local repository. The commands will look similar to this:
+git add app.py test_app.py Dockerfile requirements.txt README.md
+git commit -m "Initial commit: Add application, tests, and Docker config"
 
-    ```bash
-    git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPOSITORY_NAME.git
-    git branch -M main
-    git push -u origin main
-    ```
+Create a GitHub Repository:
 
-Your code is now on GitHub, and the CI/CD pipeline will be active.
+Go to GitHub and create a new repository. Do not initialize it with a README or .gitignore.
 
------
+Copy the commands under "...or push an existing repository from the command line."
 
-### 2\. Running the Application Locally
+Push to GitHub: In your terminal, run the commands you copied. They will look like this:
 
-For development, you can run the application directly on your machine.
+git remote add origin [https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git](https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git)
+git push -u origin main
 
-  * **Set up a Virtual Environment**:
+Your code is now on GitHub!
 
-    ```bash
-    # Create a virtual environment
-    python -m venv venv
+### 2\. Understanding the Unit Tests (Pytest)
 
-    # Activate it
-    # On Windows:
-    venv\Scripts\activate
-    # On macOS/Linux:
-    source venv/bin/activate
-    ```
+The file test_app.py contains unit tests for the application's logic. 
 
-  * **Install Dependencies**:
+test_add_workout_success: Checks if a valid workout is added correctly.
 
-    ```bash
-    pip install -r requirements.txt
-    ```
+test_add_workout_invalid_duration: Ensures the app rejects non-numeric duration values.
 
-  * **Run the Flask App**:
+test_view_workouts_empty: Verifies the correct message is returned when no workouts are logged.
 
-    ```bash
-    flask run
-    ```
+You can run these tests locally by running pytest in your terminal.
 
-Open your web browser and go to `http://127.0.0.1:5000` to see the application.
+### 3\. Understanding Containerization (Docker)
 
------
+The Dockerfile is a blueprint for creating a portable environment for our application.
 
-### 3\. Running Unit Tests Locally
+FROM python:3.9-slim: Starts with a lightweight Python image.
 
-Validate your changes before pushing them to GitHub.
+RUN apt-get update && apt-get install -y tk-dev xvfb: Installs system packages. tk-dev is for Tkinter, and xvfb is a "virtual display" that lets us run GUI tests in a command-line environment.
 
-```bash
-pytest
-```
+COPY and RUN commands: These copy our code into the image and install the Python dependencies (pytest) listed in requirements.txt.
 
------
+### 4\. Setting up the CI/CD Pipeline (GitHub Actions)
 
-### 4\. Building and Running with Docker
+This is the automation step.
 
-This simulates the production environment and how the application will run in the CI/CD pipeline. Make sure you have Docker Desktop installed and running.
+Create the Workflow Directory: In your project folder, create the necessary directories:
 
-  * **Build the Docker Image**:
+mkdir -p .github/workflows
 
-    ```bash
-    docker build -t flask-fitness-app .
-    ```
+Add the Workflow File: Move the main.yml file you downloaded into the .github/workflows/ directory.
 
-  * **Run the Docker Container**:
+Commit and Push the Workflow:
 
-    ```bash
-    docker run -p 5000:5000 flask-fitness-app
-    ```
+git add .github/workflows/main.yml
+git commit -m "feat: Add CI/CD workflow for automated testing"
+git push origin main
 
-The application will be accessible in your browser at `http://127.0.0.1:5000`.
+See it in Action:
 
------
+Go to your repository on GitHub and click on the "Actions" tab.
 
-### 5\. CI/CD Pipeline with GitHub Actions ⚙️
+You will see your workflow running. It is triggered automatically by the git push you just did.
 
-The automated pipeline is defined in the `.github/workflows/main.yml` file.
+The workflow will:
 
-  * **Trigger**: The pipeline automatically runs every time you `git push` code to the **`main`** branch.
-  * **Process**: It checks out your code, builds a **Docker image**, and then runs the **`pytest`** command inside the new container. This ensures that the application not only builds successfully but also works correctly within its containerized environment.
-  * **Monitoring**: You can check the status and logs of each run in the **"Actions"** tab of your GitHub repository. A green checkmark means everything passed\!
+Check out your code.
+
+Build the Docker image according to your Dockerfile.
+
+Run the pytest command inside the container using xvfb-run to handle the GUI components.
+
+CI/CD pipeline is implemented successfully
