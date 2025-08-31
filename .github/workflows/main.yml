@@ -26,13 +26,22 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
 
-      # Step to build the Docker image using the Dockerfile in the repository
-      - name: Build Docker image
-        run: docker build -t fitness-app .
+      # Sets up the Python environment on the runner
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9' # Specify the Python version you want to use
 
-      # Step to run the Pytest unit tests inside the newly built Docker container.
-      # 'xvfb-run' creates a virtual display environment, allowing the Tkinter
-      # app components to initialize without a physical screen, which is necessary
-      # in a headless CI/CD environment like GitHub Actions.
-      - name: Run tests in Docker container
-        run: docker run --rm fitness-app xvfb-run pytest
+      # Install system dependencies needed for Tkinter GUI testing in a headless environment
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y tk-dev xvfb
+
+      # Install Python dependencies
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      # Run the Pytest unit tests in a headless environment
+      # xvfb-run creates a virtual display, allowing the Tkinter components to run
+      # without a physical screen.
+      - name: Run tests
+        run: xvfb-run pytest
