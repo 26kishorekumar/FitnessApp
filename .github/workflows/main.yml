@@ -1,0 +1,38 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Python Application CI/CD Pipeline
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build-and-test"
+  build-and-test:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      # Step to build the Docker image using the Dockerfile in the repository
+      - name: Build Docker image
+        run: docker build -t fitness-app .
+
+      # Step to run the Pytest unit tests inside the newly built Docker container.
+      # 'xvfb-run' creates a virtual display environment, allowing the Tkinter
+      # app components to initialize without a physical screen, which is necessary
+      # in a headless CI/CD environment like GitHub Actions.
+      - name: Run tests in Docker container
+        run: docker run --rm fitness-app xvfb-run pytest
